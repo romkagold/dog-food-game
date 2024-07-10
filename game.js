@@ -51,6 +51,9 @@ const forbiddenFoods = [
     { emoji: '🍬', label: 'xylitol', color: 'white' },
     { emoji: '🥖', label: 'yeast dough', color: 'wheat' },
     { emoji: '🍟', label: 'fatty foods', color: 'gray' },
+    { emoji: '🥩', label: 'raw meat', color: 'red' },
+    { emoji: '🐟', label: 'raw fish', color: 'blue' },
+    { emoji: '🍖', label: 'bones', color: 'beige' },
     { emoji: '🥛', label: 'milk', color: 'white' },
     { emoji: '🧂', label: 'salt', color: 'white' },
     { emoji: '🌽', label: 'corn', color: 'yellow' }
@@ -149,8 +152,23 @@ function handleKeyUp(e) {
     }
 }
 
+function handleTouchStart(e) {
+    const touchX = e.touches[0].clientX;
+    if (touchX < canvas.width / 2) {
+        dog.dx = -dog.speed;
+    } else {
+        dog.dx = dog.speed;
+    }
+}
+
+function handleTouchEnd(e) {
+    dog.dx = 0;
+}
+
 document.addEventListener('keydown', handleKeyDown);
 document.addEventListener('keyup', handleKeyUp);
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchend', handleTouchEnd);
 
 setInterval(createFood, 1000);
 update();
