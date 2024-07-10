@@ -154,6 +154,7 @@ function handleKeyUp(e) {
 
 function handleTouchStart(e) {
     const touchX = e.touches[0].clientX;
+    console.log(`Touch start at ${touchX}`);
     if (touchX < canvas.width / 2) {
         dog.dx = -dog.speed;
     } else {
@@ -162,6 +163,7 @@ function handleTouchStart(e) {
 }
 
 function handleTouchEnd(e) {
+    console.log('Touch end');
     dog.dx = 0;
 }
 
