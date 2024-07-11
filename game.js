@@ -1,5 +1,11 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const modal = document.getElementById('modal');
+const closeBtn = document.getElementById('close-btn');
+const explanationText = document.getElementById('explanation');
+
+let isGamePaused = false;
+const encounteredForbiddenFoods = new Set();
 
 // Adjust canvas size to 9:16 aspect ratio or fit the screen
 const aspectRatio = 9 / 16;
@@ -39,24 +45,28 @@ const allowedFoods = [
     { emoji: '🍗', label: 'turkey', color: 'lightbrown' }
 ];
 const forbiddenFoods = [
-    { emoji: '🍫', label: 'chocolate', color: 'brown' },
-    { emoji: '🍇', label: 'grape', color: 'purple' },
-    { emoji: '🧅', label: 'onion', color: 'white' },
-    { emoji: '🍇', label: 'raisins', color: 'purple' },
-    { emoji: '🧄', label: 'garlic', color: 'white' },
-    { emoji: '🥑', label: 'avocado', color: 'green' },
-    { emoji: '🍷', label: 'alcohol', color: 'red' },
-    { emoji: '☕', label: 'caffeine', color: 'black' },
-    { emoji: '🌰', label: 'macadamia nuts', color: 'brown' },
-    { emoji: '🍬', label: 'xylitol', color: 'white' },
-    { emoji: '🥖', label: 'yeast dough', color: 'wheat' },
-    { emoji: '🍟', label: 'fatty foods', color: 'gray' },
-    { emoji: '🥛', label: 'milk', color: 'white' },
-    { emoji: '🧂', label: 'salt', color: 'white' },
-    { emoji: '🌽', label: 'corn', color: 'yellow' }
+    { emoji: '🍫', label: 'chocolate', color: 'brown', explanation: 'Chocolate contains theobromine, which is toxic to dogs.' },
+    { emoji: '🍇', label: 'grape', color: 'purple', explanation: 'Grapes and raisins can cause kidney failure in dogs.' },
+    { emoji: '🧅', label: 'onion', color: 'white', explanation: 'Onions can lead to anemia by damaging red blood cells in dogs.' },
+    { emoji: '🍇', label: 'raisins', color: 'purple', explanation: 'Raisins can cause kidney failure in dogs.' },
+    { emoji: '🧄', label: 'garlic', color: 'white', explanation: 'Garlic can lead to anemia by damaging red blood cells in dogs.' },
+    { emoji: '🥑', label: 'avocado', color: 'green', explanation: 'Avocado contains persin, which is toxic to dogs.' },
+    { emoji: '🍷', label: 'alcohol', color: 'red', explanation: 'Alcohol can cause severe toxicity in dogs.' },
+    { emoji: '☕', label: 'caffeine', color: 'black', explanation: 'Caffeine can lead to hyperactivity and rapid heart rate in dogs.' },
+    { emoji: '🌰', label: 'macadamia nuts', color: 'brown', explanation: 'Macadamia nuts can cause weakness, vomiting, and tremors in dogs.' },
+    { emoji: '🍬', label: 'xylitol', color: 'white', explanation: 'Xylitol can cause insulin release, leading to liver failure in dogs.' },
+    { emoji: '🥖', label: 'yeast dough', color: 'wheat', explanation: 'Yeast dough can expand in the stomach, causing severe pain and potential rupture in dogs.' },
+    { emoji: '🍟', label: 'fatty foods', color: 'gray', explanation: 'Fatty foods can lead to pancreatitis in dogs.' },
+    { emoji: '🥩', label: 'raw meat', color: 'red', explanation: 'Raw meat can contain bacteria like Salmonella and E. coli, and parasites.' },
+    { emoji: '🐟', label: 'raw fish', color: 'blue', explanation: 'Raw fish can contain parasites that are harmful to dogs.' },
+    { emoji: '🍖', label: 'bones', color: 'beige', explanation: 'Bones can splinter and cause choking or digestive tract damage in dogs.' },
+    { emoji: '🥛', label: 'milk', color: 'white', explanation: 'Many dogs are lactose intolerant, which can lead to digestive upset.' },
+    { emoji: '🧂', label: 'salt', color: 'white', explanation: 'Salt can lead to excessive thirst and urination, or even sodium ion poisoning in dogs.' },
+    { emoji: '🌽', label: 'corn', color: 'yellow', explanation: 'Corn on the cob can cause intestinal blockage in dogs.' }
 ];
 
 function createFood() {
+    if (isGamePaused) return;
     const foodList = Math.random() > 0.5 ? allowedFoods : forbiddenFoods;
     const food = foodList[Math.floor(Math.random() * foodList.length)];
     const x = Math.random() * (canvas.width - 30);
@@ -88,17 +98,11 @@ function moveDog() {
 }
 
 function moveFoods() {
-    foods.forEach(food => {
-        food.y += 2;
-    });
-}
-
-function checkCollision() {
+    if (isGamePaused) return;
     foods.forEach((food, index) => {
-        if (food.y + 30 > dog.y && food.y < dog.y + dog.size && food.x + 30 > dog.x && food.x < dog.x + dog.size) {
+        food.y += 2;
+        if (food.y > canvas.height) {
             if (allowedFoods.some(f => f.label === food.label)) {
-                dog.score += 10;
-            } else {
                 dog.lives -= 1;
                 if (dog.lives <= 0) {
                     alert('Game Over! Your score: ' + dog.score);
@@ -109,6 +113,35 @@ function checkCollision() {
         }
     });
 }
+
+function checkCollision() {
+    foods.forEach((food, index) => {
+        if (food.y + 30 > dog.y && food.y < dog.y + dog.size && food.x + 30 > dog.x && food.x < dog.x + dog.size) {
+            if (allowedFoods.some(f => f.label === food.label)) {
+                dog.score += 10;
+            } else {
+                if (!encounteredForbiddenFoods.has(food.label)) {
+                    encounteredForbiddenFoods.add(food.label);
+                    explanationText.textContent = food.explanation;
+                    modal.style.display = 'flex';
+                    isGamePaused = true;
+                }
+                dog.lives -= 1;
+                if (dog.lives <= 0) {
+                    alert('Game Over! Your score: ' + dog.score);
+                    document.location.reload();
+                }
+            }
+            foods.splice(index, 1);
+        }
+    });
+}
+
+closeBtn.onclick = function() {
+    modal.style.display = 'none';
+    isGamePaused = false;
+    requestAnimationFrame(update);
+};
 
 function drawScore() {
     ctx.fillStyle = 'black';
@@ -123,16 +156,18 @@ function drawLives() {
 }
 
 function update() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    moveDog();
-    moveFoods();
-    checkCollision();
-    drawDog();
-    foods.forEach(drawFood);
-    drawScore();
-    drawLives();
+    if (!isGamePaused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        moveDog();
+        moveFoods();
+        checkCollision();
+        drawDog();
+        foods.forEach(drawFood);
+        drawScore();
+        drawLives();
 
-    requestAnimationFrame(update);
+        requestAnimationFrame(update);
+    }
 }
 
 function handleKeyDown(e) {
