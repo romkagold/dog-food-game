@@ -67,7 +67,7 @@ const forbiddenFoods = [
     { emoji: '🌽', label: 'corn', color: 'yellow', explanation: 'Corn on the cob can cause intestinal blockage in dogs.' },
     { emoji: '🍬', label: 'sugar', color: 'white', explanation: 'Can lead to obesity and dental issues.' },
     { emoji: '🌶️', label: 'spicy foods', color: 'red', explanation: 'Can cause stomach upset and other digestive issues.' },
-    { emoji: '🍭', label: 'artificial sweeteners', color: 'pink', explanation: 'Especially xylitol, which is highly toxic to dogs.' },
+    { emoji: '🍭', label: 'artificial sweeteners', color: 'pink', explanation: 'Artificial sweeteners. Especially xylitol, which is highly toxic to dogs.' },
     { emoji: '🍋', label: 'citrus fruits', color: 'yellow', explanation: 'Can cause stomach upset due to high acidity.' },
     { emoji: '🍩', label: 'cinnamon', color: 'brown', explanation: 'In large amounts, can cause irritation and other problems.' },
     { emoji: '🥧', label: 'nutmeg', color: 'brown', explanation: 'Contains myristicin, which can cause hallucinations and other issues.' }
