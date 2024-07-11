@@ -30,20 +30,25 @@ const dog = {
 
 const foods = [];
 const allowedFoods = [
-    { emoji: '🍏', label: 'apple', color: 'green' },
-    { emoji: '🥕', label: 'carrot', color: 'orange' },
-    { emoji: '🍗', label: 'chicken', color: 'yellow' },
-    { emoji: '🎃', label: 'pumpkin', color: 'orange' },
-    { emoji: '🍃', label: 'green beans', color: 'green' },
-    { emoji: '🍠', label: 'sweet potato', color: 'orange' },
-    { emoji: '🥜', label: 'peanut butter', color: 'brown' },
-    { emoji: '🍦', label: 'yogurt', color: 'white' },
-    { emoji: '🍚', label: 'rice', color: 'white' },
-    { emoji: '🧀', label: 'cheese', color: 'yellow' },
-    { emoji: '🥚', label: 'eggs', color: 'yellow' },
-    { emoji: '🍞', label: 'bread', color: 'wheat' },
-    { emoji: '🍗', label: 'turkey', color: 'lightbrown' }
+    { emoji: '🍏', label: 'apple', color: 'green', note: 'Remove seeds and core.' },
+    { emoji: '🥕', label: 'carrot', color: 'orange', note: 'Raw or cooked.' },
+    { emoji: '🍗', label: 'chicken', color: 'yellow', note: 'Cooked, without bones.' },
+    { emoji: '🎃', label: 'pumpkin', color: 'orange', note: 'Cooked, without seeds.' },
+    { emoji: '🍃', label: 'green beans', color: 'green', note: 'Raw or cooked.' },
+    { emoji: '🍠', label: 'sweet potato', color: 'orange', note: 'Cooked, without skin.' },
+    { emoji: '🥜', label: 'peanut butter', color: 'brown', note: 'Unsweetened and unsalted.' },
+    { emoji: '🍦', label: 'yogurt', color: 'white', note: 'Plain and unsweetened.' },
+    { emoji: '🍚', label: 'rice', color: 'white', note: 'Cooked, plain white or brown rice.' },
+    { emoji: '🧀', label: 'cheese', color: 'yellow', note: 'Low-fat, in moderation.' },
+    { emoji: '🥚', label: 'eggs', color: 'yellow', note: 'Cooked.' },
+    { emoji: '🍞', label: 'bread', color: 'wheat', note: 'Plain, in small amounts.' },
+    { emoji: '🍗', label: 'turkey', color: 'lightbrown', note: 'Cooked, without bones.' },
+    { emoji: '🫐', label: 'blueberries', color: 'blue', note: 'Fresh or frozen, in moderation.' },
+    { emoji: '🍌', label: 'bananas', color: 'yellow', note: 'In small amounts, avoid the peel.' },
+    { emoji: '🥒', label: 'cucumber', color: 'green', note: 'Fresh, sliced or chopped.' },
+    { emoji: '🍈', label: 'melon', color: 'green', note: 'Without seeds, in moderation.' },
 ];
+
 const forbiddenFoods = [
     { emoji: '🍫', label: 'chocolate', color: 'brown', explanation: 'Chocolate contains theobromine, which is toxic to dogs.' },
     { emoji: '🍇', label: 'grape', color: 'purple', explanation: 'Grapes and raisins can cause kidney failure in dogs.' },
@@ -57,13 +62,17 @@ const forbiddenFoods = [
     { emoji: '🍬', label: 'xylitol', color: 'white', explanation: 'Xylitol can cause insulin release, leading to liver failure in dogs.' },
     { emoji: '🥖', label: 'yeast dough', color: 'wheat', explanation: 'Yeast dough can expand in the stomach, causing severe pain and potential rupture in dogs.' },
     { emoji: '🍟', label: 'fatty foods', color: 'gray', explanation: 'Fatty foods can lead to pancreatitis in dogs.' },
-    { emoji: '🥩', label: 'raw meat', color: 'red', explanation: 'Raw meat can contain bacteria like Salmonella and E. coli, and parasites.' },
-    { emoji: '🐟', label: 'raw fish', color: 'blue', explanation: 'Raw fish can contain parasites that are harmful to dogs.' },
-    { emoji: '🍖', label: 'bones', color: 'beige', explanation: 'Bones can splinter and cause choking or digestive tract damage in dogs.' },
     { emoji: '🥛', label: 'milk', color: 'white', explanation: 'Many dogs are lactose intolerant, which can lead to digestive upset.' },
     { emoji: '🧂', label: 'salt', color: 'white', explanation: 'Salt can lead to excessive thirst and urination, or even sodium ion poisoning in dogs.' },
-    { emoji: '🌽', label: 'corn', color: 'yellow', explanation: 'Corn on the cob can cause intestinal blockage in dogs.' }
+    { emoji: '🌽', label: 'corn', color: 'yellow', explanation: 'Corn on the cob can cause intestinal blockage in dogs.' },
+    { emoji: '🍬', label: 'sugar', color: 'white', explanation: 'Can lead to obesity and dental issues.' },
+    { emoji: '🌶️', label: 'spicy foods', color: 'red', explanation: 'Can cause stomach upset and other digestive issues.' },
+    { emoji: '🍭', label: 'artificial sweeteners', color: 'pink', explanation: 'Especially xylitol, which is highly toxic to dogs.' },
+    { emoji: '🍋', label: 'citrus fruits', color: 'yellow', explanation: 'Can cause stomach upset due to high acidity.' },
+    { emoji: '🍩', label: 'cinnamon', color: 'brown', explanation: 'In large amounts, can cause irritation and other problems.' },
+    { emoji: '🥧', label: 'nutmeg', color: 'brown', explanation: 'Contains myristicin, which can cause hallucinations and other issues.' }
 ];
+
 
 function createFood() {
     if (isGamePaused) return;
