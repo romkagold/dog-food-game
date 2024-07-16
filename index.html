@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dog Food Game</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { background: #87CEEB; display: block; margin: 0 auto; }
-        #modal {
+        body { margin: 0; overflow: hidden; user-select: none; }
+        canvas { background: #87CEEB; display: block; margin: 0 auto; touch-action: none; }
+        #modal, #game-over-modal {
             display: none; 
             position: fixed; 
             z-index: 1; 
@@ -20,7 +20,7 @@
             justify-content: center;
             align-items: center;
         }
-        #modal-content {
+        #modal-content, #game-over-content {
             background-color: #fefefe;
             margin: auto;
             padding: 20px;
@@ -33,7 +33,7 @@
             align-items: center;
             justify-content: space-between;
         }
-        #close-btn {
+        #close-btn, #restart-btn {
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
@@ -54,6 +54,12 @@
         <div id="modal-content">
             <p id="explanation"></p>
             <button id="close-btn">CLOSE</button>
+        </div>
+    </div>
+    <div id="game-over-modal">
+        <div id="game-over-content">
+            <p id="game-over-message"></p>
+            <button id="restart-btn">RESTART</button>
         </div>
     </div>
     <script src="game.js"></script>

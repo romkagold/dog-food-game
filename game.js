@@ -1,11 +1,17 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const modal = document.getElementById('modal');
+const gameOverModal = document.getElementById('game-over-modal');
 const closeBtn = document.getElementById('close-btn');
+const restartBtn = document.getElementById('restart-btn');
 const explanationText = document.getElementById('explanation');
+const gameOverMessage = document.getElementById('game-over-message');
 
 let isGamePaused = false;
 const encounteredForbiddenFoods = new Set();
+let highScore = 0;
+let fallSpeed = 1;
+const initialFallSpeed = 1;
 
 // Adjust canvas size to 9:16 aspect ratio or fit the screen
 const aspectRatio = 9 / 16;
@@ -25,7 +31,8 @@ const dog = {
     dx: 0,
     speed: 5,
     lives: 6,
-    score: 0
+    score: 0,
+    hunger: 0
 };
 
 const foods = [];
@@ -45,6 +52,7 @@ const allowedFoods = [
     { emoji: '🍗', label: 'turkey', color: 'lightbrown', note: 'Cooked, without bones.' },
     { emoji: '🫐', label: 'blueberries', color: 'blue', note: 'Fresh or frozen, in moderation.' },
     { emoji: '🍌', label: 'bananas', color: 'yellow', note: 'In small amounts, avoid the peel.' },
+    { emoji: '🍜', label: 'peas', color: 'green', note: 'Fresh, frozen, or cooked.' },
     { emoji: '🥒', label: 'cucumber', color: 'green', note: 'Fresh, sliced or chopped.' },
     { emoji: '🍈', label: 'melon', color: 'green', note: 'Without seeds, in moderation.' },
 ];
@@ -65,21 +73,19 @@ const forbiddenFoods = [
     { emoji: '🥛', label: 'milk', color: 'white', explanation: 'Many dogs are lactose intolerant, which can lead to digestive upset.' },
     { emoji: '🧂', label: 'salt', color: 'white', explanation: 'Salt can lead to excessive thirst and urination, or even sodium ion poisoning in dogs.' },
     { emoji: '🌽', label: 'corn', color: 'yellow', explanation: 'Corn on the cob can cause intestinal blockage in dogs.' },
-    { emoji: '🍬', label: 'sugar', color: 'white', explanation: 'Sugar an lead to obesity and dental issues.' },
-    { emoji: '🌶️', label: 'spicy foods', color: 'red', explanation: 'Spicy foods can cause stomach upset and other digestive issues.' },
-    { emoji: '🍭', label: 'artificial sweeteners', color: 'pink', explanation: 'Artificial sweeteners. Especially xylitol, which is highly toxic to dogs.' },
+    { emoji: '🍬', label: 'sugar', color: 'white', explanation: 'Can lead to obesity and dental issues.' },
+    { emoji: '🌶️', label: 'spicy foods', color: 'red', explanation: 'Can cause stomach upset and other digestive issues.' },
     { emoji: '🍋', label: 'citrus fruits', color: 'yellow', explanation: 'Can cause stomach upset due to high acidity.' },
-    { emoji: '🍩', label: 'cinnamon', color: 'brown', explanation: 'Cinamom in large amounts, can cause irritation and other problems.' },
+    { emoji: '🍩', label: 'cinnamon', color: 'brown', explanation: 'In large amounts, can cause irritation and other problems.' },
     { emoji: '🥧', label: 'nutmeg', color: 'brown', explanation: 'Contains myristicin, which can cause hallucinations and other issues.' }
 ];
-
 
 function createFood() {
     if (isGamePaused) return;
     const foodList = Math.random() > 0.5 ? allowedFoods : forbiddenFoods;
     const food = foodList[Math.floor(Math.random() * foodList.length)];
     const x = Math.random() * (canvas.width - 30);
-    foods.push({ x, y: 0, ...food });
+    foods.push({ x, y: 0, dx: 0, dy: fallSpeed, ...food });
 }
 
 function drawDog() {
@@ -109,13 +115,17 @@ function moveDog() {
 function moveFoods() {
     if (isGamePaused) return;
     foods.forEach((food, index) => {
-        food.y += 2;
+        food.y += food.dy;
+
         if (food.y > canvas.height) {
             if (allowedFoods.some(f => f.label === food.label)) {
-                dog.lives -= 1;
+                dog.hunger += 1;
+                if (dog.hunger >= 3) {
+                    dog.lives -= 1;
+                    dog.hunger = 0;
+                }
                 if (dog.lives <= 0) {
-                    alert('Game Over! Your score: ' + dog.score);
-                    document.location.reload();
+                    endGame();
                 }
             }
             foods.splice(index, 1);
@@ -127,23 +137,46 @@ function checkCollision() {
     foods.forEach((food, index) => {
         if (food.y + 30 > dog.y && food.y < dog.y + dog.size && food.x + 30 > dog.x && food.x < dog.x + dog.size) {
             if (allowedFoods.some(f => f.label === food.label)) {
-                dog.score += 10;
+                dog.score += 1;
+                if (dog.hunger > 0) {
+                    dog.hunger -= 1;
+                }
             } else {
                 if (!encounteredForbiddenFoods.has(food.label)) {
                     encounteredForbiddenFoods.add(food.label);
-                    explanationText.textContent = food.explanation;
+                    explanationText.textContent = `${food.label.charAt(0).toUpperCase() + food.label.slice(1)}: ${food.explanation}`;
                     modal.style.display = 'flex';
                     isGamePaused = true;
                 }
                 dog.lives -= 1;
                 if (dog.lives <= 0) {
-                    alert('Game Over! Your score: ' + dog.score);
-                    document.location.reload();
+                    endGame();
                 }
             }
             foods.splice(index, 1);
         }
     });
+}
+
+function endGame() {
+    isGamePaused = true;
+    if (dog.score > highScore) {
+        highScore = dog.score;
+    }
+    gameOverMessage.textContent = `Game Over! Your score: ${dog.score}. High score: ${highScore}.`;
+    gameOverModal.style.display = 'flex';
+}
+
+function restartGame() {
+    isGamePaused = false;
+    dog.lives = 6;
+    dog.score = 0;
+    dog.hunger = 0;
+    fallSpeed = initialFallSpeed;
+    foods.length = 0;
+    encounteredForbiddenFoods.clear();
+    gameOverModal.style.display = 'none';
+    requestAnimationFrame(update);
 }
 
 closeBtn.onclick = function() {
@@ -152,16 +185,22 @@ closeBtn.onclick = function() {
     requestAnimationFrame(update);
 };
 
+restartBtn.onclick = function() {
+    restartGame();
+};
+
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.font = '20px Arial';
     ctx.fillText('Score: ' + dog.score, 20, 30);
+    ctx.fillText('High Score: ' + highScore, 20, 60);
 }
 
 function drawLives() {
     ctx.fillStyle = 'black';
     ctx.font = '20px Arial';
-    ctx.fillText('Lives: ' + dog.lives, 20, 60);
+    ctx.fillText('Lives: ' + '❤️'.repeat(dog.lives), 20, 90);
+    ctx.fillText('Hunger: ' + '🍽️'.repeat(dog.hunger), 20, 120);
 }
 
 function update() {
